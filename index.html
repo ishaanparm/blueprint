@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blueprint — Find help in NYC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     Blueprint — v1 (fun edition)
+     A friendly router that takes New Yorkers straight to help.
+     Look: bright architectural sketchbook — dotted paper, chunky
+     sticker-shadow tiles, one bold color per category, bouncy
+     hovers. Playful where it invites you in; calm and clear where
+     someone might be in a crisis.
+     ============================================================ */
+
+  :root{
+    --paper:#EDF3FF;
+    --dot:#CBDCF7;
+    --white:#FFFFFF;
+    --ink:#17324D;
+    --ink-soft:#5B7291;
+    --brand:#2F6BFF;
+    --brand-deep:#1E4FD0;
+    --amber:#F5A623;
+    --red:#E8402E;
+    --red-wash:#FEE7E3;
+    --radius:16px;
+    --radius-sm:11px;
+    --maxw:980px;
+    /* live category color, set per-view */
+    --cat:#2F6BFF;
+    --cat-wash:#DFE9FF;
+  }
+
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    margin:0;
+    font-family:"Inter",system-ui,sans-serif;
+    color:var(--ink);
+    background-color:var(--paper);
+    background-image:radial-gradient(var(--dot) 1.6px, transparent 1.6px);
+    background-size:22px 22px;
+    line-height:1.55;
+    min-height:100vh;
+  }
+
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 20px 130px;}
+
+  /* ---------- header ---------- */
+  header.top{
+    max-width:var(--maxw);margin:0 auto;
+    padding:20px;display:flex;align-items:center;justify-content:space-between;gap:14px;
+  }
+  .brand{display:flex;flex-direction:column;gap:1px;cursor:pointer;background:none;border:none;text-align:left;padding:0;}
+  .wordmark{
+    font-family:"Fredoka",sans-serif;font-weight:700;font-size:34px;letter-spacing:-0.01em;
+    line-height:.9;color:var(--ink);display:inline-block;position:relative;
+  }
+  .wordmark .b{color:var(--brand);}
+  .wordmark svg{position:absolute;left:0;bottom:-9px;width:100%;height:9px;}
+  .tagline{
+    font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:0.12em;
+    text-transform:uppercase;color:var(--ink-soft);margin-top:12px;
+  }
+  .head-emergency{
+    font-family:"Fredoka",sans-serif;font-weight:600;font-size:14px;
+    color:#fff;background:var(--red);border:2.5px solid var(--ink);border-radius:999px;
+    padding:9px 16px;cursor:pointer;white-space:nowrap;
+    box-shadow:3px 3px 0 var(--ink);transition:transform .1s ease, box-shadow .1s ease;
+  }
+  .head-emergency:hover,.head-emergency:focus-visible{
+    transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--ink);outline:none;
+  }
+  .head-emergency:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink);}
+  .pulse{display:inline-block;width:8px;height:8px;border-radius:50%;background:#fff;margin-right:7px;vertical-align:middle;animation:pulse 1.6s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+
+  /* ---------- crumb ---------- */
+  .crumb{
+    display:flex;align-items:center;gap:9px;flex-wrap:wrap;
+    font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:0.05em;
+    color:var(--ink-soft);margin:14px 0 2px;min-height:18px;
+  }
+  .crumb .step{cursor:pointer;color:var(--brand);font-weight:600;}
+  .crumb .step[aria-disabled="true"]{color:var(--ink-soft);cursor:default;font-weight:500;}
+  .crumb .sep{color:var(--dot);}
+
+  /* ---------- hero / titles ---------- */
+  .q{
+    font-family:"Fredoka",sans-serif;font-weight:600;
+    font-size:clamp(30px,6vw,46px);letter-spacing:-0.015em;line-height:1.02;margin:14px 0 8px;
+  }
+  .q .wink{display:inline-block;animation:wink 3s ease-in-out infinite;transform-origin:70% 70%;}
+  @keyframes wink{0%,88%,100%{transform:rotate(0);}92%{transform:rotate(16deg);}96%{transform:rotate(-8deg);}}
+  .q-sub{color:var(--ink-soft);font-size:16px;margin:0 0 30px;max-width:54ch;}
+
+  /* ---------- category grid ---------- */
+  .grid-cats{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:18px;}
+  .cat{
+    --c:var(--brand);--cw:var(--brand-wash);
+    position:relative;text-align:left;cursor:pointer;font-family:inherit;color:var(--ink);
+    background:var(--cw);border:2.5px solid var(--ink);border-radius:var(--radius);
+    padding:18px 17px 16px;display:flex;flex-direction:column;gap:7px;min-height:132px;
+    box-shadow:5px 5px 0 var(--ink);
+    transition:transform .13s cubic-bezier(.34,1.56,.64,1), box-shadow .13s ease;
+  }
+  .cat:hover,.cat:focus-visible{
+    transform:translate(-2px,-3px) rotate(-1deg);box-shadow:8px 9px 0 var(--c);outline:none;
+  }
+  .cat:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--c);}
+  .cat .emoji{
+    font-size:30px;line-height:1;width:52px;height:52px;display:flex;align-items:center;justify-content:center;
+    background:#fff;border:2.5px solid var(--ink);border-radius:13px;box-shadow:2px 2px 0 var(--c);
+  }
+  .cat-name{font-family:"Fredoka",sans-serif;font-weight:600;font-size:21px;line-height:1.1;margin-top:4px;}
+  .cat-desc{font-size:13.5px;color:var(--ink-soft);line-height:1.42;}
+
+  .divider-note{
+    grid-column:1/-1;display:flex;align-items:center;gap:12px;
+    font-family:"Fredoka",sans-serif;font-weight:500;font-size:15px;color:var(--ink-soft);margin:10px 0 0;
+  }
+  .divider-note::before,.divider-note::after{content:"";height:2.5px;border-radius:2px;background:var(--dot);flex:1;}
+  .cat.visitor{border-style:dashed;}
+
+  /* ---------- borough grid ---------- */
+  .grid-boro{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;}
+  .boro{
+    background:#fff;border:2.5px solid var(--ink);border-radius:var(--radius-sm);
+    padding:16px 16px;cursor:pointer;font-family:"Fredoka",sans-serif;font-weight:500;font-size:18px;
+    color:var(--ink);text-align:left;display:flex;align-items:center;justify-content:space-between;gap:8px;
+    box-shadow:4px 4px 0 var(--ink);transition:transform .12s cubic-bezier(.34,1.56,.64,1), box-shadow .12s ease;
+  }
+  .boro:hover,.boro:focus-visible{transform:translate(-2px,-2px) rotate(-1deg);box-shadow:6px 7px 0 var(--cat);outline:none;}
+  .boro:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--cat);}
+  .boro .arrow{color:var(--cat);font-weight:700;font-size:20px;}
+  .boro.wide{grid-column:1/-1;border-style:dashed;background:var(--cat-wash);}
+
+  /* ---------- results ---------- */
+  .results-meta{
+    display:inline-flex;align-items:center;gap:8px;
+    font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:0.04em;color:var(--ink-soft);
+    background:#fff;border:2px solid var(--ink);border-radius:999px;padding:5px 13px;margin:2px 0 24px;
+    box-shadow:2px 2px 0 var(--cat);
+  }
+  .cards{display:flex;flex-direction:column;gap:20px;}
+  .card{
+    position:relative;background:var(--white);border:2.5px solid var(--ink);border-radius:var(--radius);
+    box-shadow:6px 6px 0 var(--cat);overflow:hidden;
+  }
+  .card-stripe{height:9px;background:var(--cat);}
+  .card-top{padding:18px 20px 6px;}
+  .card-name{font-family:"Fredoka",sans-serif;font-weight:600;font-size:22px;line-height:1.12;margin:0 0 5px;}
+  .card-helps{color:var(--ink-soft);font-size:15px;margin:0 0 15px;}
+
+  .card-actions{display:flex;flex-wrap:wrap;gap:11px;}
+  .btn-call{
+    display:inline-flex;align-items:center;gap:8px;background:var(--cat);color:#fff;
+    border:2.5px solid var(--ink);border-radius:999px;font-family:"Fredoka",sans-serif;font-weight:600;font-size:15px;
+    padding:10px 18px;text-decoration:none;cursor:pointer;box-shadow:3px 3px 0 var(--ink);
+    transition:transform .1s ease, box-shadow .1s ease;
+  }
+  .btn-call:hover,.btn-call:focus-visible{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--ink);outline:none;}
+  .btn-call:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink);}
+  .btn-link{
+    display:inline-flex;align-items:center;gap:6px;background:#fff;color:var(--ink);
+    border:2.5px solid var(--ink);border-radius:999px;font-family:"Fredoka",sans-serif;font-weight:500;font-size:14px;
+    padding:9px 16px;text-decoration:none;box-shadow:3px 3px 0 var(--cat);
+    transition:transform .1s ease, box-shadow .1s ease;
+  }
+  .btn-link:hover,.btn-link:focus-visible{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--cat);outline:none;}
+  .btn-link:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--cat);}
+
+  .script{
+    margin:15px 20px 0;background:var(--cat-wash);border:2px solid var(--ink);border-radius:var(--radius-sm);
+    padding:13px 15px;
+  }
+  .script .lbl{
+    font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;
+    color:var(--ink);font-weight:600;display:flex;align-items:center;gap:6px;margin-bottom:6px;
+  }
+  .script .quote{font-family:"Fredoka",sans-serif;font-weight:400;font-size:17px;color:var(--ink);line-height:1.45;}
+
+  .docs{padding:15px 20px 0;}
+  .docs .lbl{
+    font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;
+    color:var(--ink-soft);font-weight:600;display:block;margin-bottom:7px;
+  }
+  .docs ul{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:7px;}
+  .docs li{
+    font-size:13px;background:var(--paper);border:2px solid var(--ink);border-radius:999px;
+    padding:4px 11px;color:var(--ink);font-weight:500;
+  }
+  .docs .none{font-size:13.5px;color:var(--ink-soft);font-style:italic;}
+
+  .card-note{
+    margin:15px 20px 0;font-size:13.5px;color:var(--ink);background:#FFF6E4;
+    border:2px solid var(--ink);border-radius:var(--radius-sm);padding:10px 13px;font-weight:500;
+  }
+  .card-note b{color:var(--brand-deep);}
+
+  .card-foot{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+    margin-top:18px;padding:11px 20px;border-top:2px dashed var(--dot);
+    font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:0.04em;color:var(--ink-soft);
+  }
+  .verified{display:inline-flex;align-items:center;gap:6px;}
+  .verified .dot{width:8px;height:8px;border-radius:50%;background:var(--cat);border:1.5px solid var(--ink);}
+
+  /* ---------- emergency (kept calm & clear) ---------- */
+  .emerg-head{
+    background:var(--red-wash);border:2.5px solid var(--ink);border-radius:var(--radius);
+    padding:17px 19px;margin:6px 0 22px;box-shadow:5px 5px 0 var(--red);
+  }
+  .emerg-head h2{font-family:"Fredoka",sans-serif;font-weight:600;font-size:26px;margin:0 0 5px;color:var(--red);}
+  .emerg-head p{margin:0;color:var(--ink);font-size:15px;}
+  .emerg-card{
+    background:#fff;border:2.5px solid var(--ink);border-radius:var(--radius-sm);
+    padding:16px 18px;display:flex;flex-direction:column;gap:5px;box-shadow:4px 4px 0 var(--ink);
+  }
+  .emerg-card .num{font-family:"Fredoka",sans-serif;font-weight:700;font-size:24px;}
+  .emerg-card .num a{color:var(--ink);text-decoration:none;}
+  .emerg-card .num a:hover{color:var(--brand);}
+  .emerg-card .when{color:var(--ink-soft);font-size:14.5px;}
+  .emerg-card.danger{box-shadow:4px 4px 0 var(--red);}
+  .emerg-card.danger .num a{color:var(--red);}
+
+  /* ---------- tourism ---------- */
+  .visitor-banner{
+    display:flex;align-items:center;gap:11px;background:var(--cat-wash);
+    border:2.5px dashed var(--ink);border-radius:var(--radius);padding:13px 16px;margin:6px 0 24px;
+    font-size:14.5px;color:var(--ink);font-weight:500;
+  }
+  .visitor-banner .stamp{
+    font-family:"Fredoka",sans-serif;font-weight:600;font-size:13px;letter-spacing:0.04em;text-transform:uppercase;
+    color:#fff;background:var(--cat);border:2.5px solid var(--ink);padding:4px 11px;border-radius:999px;white-space:nowrap;
+    box-shadow:2px 2px 0 var(--ink);
+  }
+
+  /* ---------- back ---------- */
+  .back{
+    display:inline-flex;align-items:center;gap:7px;background:#fff;border:2.5px solid var(--ink);cursor:pointer;
+    font-family:"Fredoka",sans-serif;font-weight:500;font-size:14px;color:var(--ink);
+    padding:9px 16px;margin:26px 0 0;border-radius:999px;box-shadow:3px 3px 0 var(--ink);
+    transition:transform .1s ease, box-shadow .1s ease;
+  }
+  .back:hover,.back:focus-visible{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--ink);outline:none;}
+  .back:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink);}
+
+  /* ---------- footer stamp ---------- */
+  .titleblock{
+    max-width:var(--maxw);margin:44px auto 0;background:#fff;border:2.5px solid var(--ink);border-radius:var(--radius);
+    display:grid;grid-template-columns:1.4fr 1fr 1fr;box-shadow:5px 5px 0 var(--brand);overflow:hidden;
+  }
+  .titleblock div{padding:12px 16px;border-right:2px solid var(--paper);}
+  .titleblock div:last-child{border-right:none;}
+  .titleblock .k{
+    font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;
+    color:var(--ink-soft);display:block;margin-bottom:3px;
+  }
+  .titleblock .v{font-family:"Fredoka",sans-serif;font-size:15px;font-weight:500;color:var(--ink);}
+  .lang-bar{max-width:var(--maxw);margin:22px auto 0;display:flex;flex-wrap:wrap;align-items:center;gap:8px;}
+  .lang-bar .globe{font-size:16px;margin-right:2px;}
+  .lang-chip{
+    font-family:"Fredoka",sans-serif;font-weight:500;font-size:13px;color:#000;
+    background:#fff;border:2px solid #000;border-radius:999px;padding:5px 13px;cursor:pointer;
+    box-shadow:2px 2px 0 #000;transition:transform .1s ease, box-shadow .1s ease;
+  }
+  .lang-chip:hover,.lang-chip:focus-visible{transform:translate(-1px,-1px);box-shadow:3px 3px 0 #000;outline:none;}
+  .lang-chip:active{transform:translate(2px,2px);box-shadow:0 0 0 #000;}
+  .lang-chip.active{background:#000;color:#fff;}
+  .disclaimer{max-width:var(--maxw);margin:12px auto 0;font-size:13.5px;color:#000;line-height:1.6;}
+  .disclaimer b{color:#000;font-weight:700;}
+  .disclaimer a{color:#000;font-weight:700;text-decoration:underline;text-underline-offset:2px;}
+  .disclaimer[dir="rtl"]{text-align:right;}
+
+  /* ---------- views ---------- */
+  .view{display:none;}
+  .view.active{display:block;animation:pop .22s cubic-bezier(.34,1.56,.64,1);}
+  @keyframes pop{from{opacity:0;transform:translateY(8px) scale(.99);}to{opacity:1;transform:none;}}
+  a:focus-visible,button:focus-visible{outline:3px solid var(--brand);outline-offset:2px;}
+
+  @media (max-width:560px){
+    .wordmark{font-size:29px;}
+    .titleblock{grid-template-columns:1fr 1fr;}
+    .titleblock div:nth-child(2){border-right:none;}
+    .wrap{padding:0 16px 110px;}
+    .grid-cats{gap:15px;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important;}
+    .cat:hover,.boro:hover,.btn-call:hover,.btn-link:hover,.back:hover,.head-emergency:hover{transform:none;}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <button class="brand" onclick="goCats()" aria-label="Blueprint home">
+    <span class="wordmark"><span class="b">Blue</span>print
+      <svg viewBox="0 0 200 9" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M2 6 Q 40 1 80 5 T 160 4 T 198 6" fill="none" stroke="#F5A623" stroke-width="3.5" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <span class="tagline">Find help in NYC</span>
+  </button>
+  <button class="head-emergency" onclick="showEmergency()"><span class="pulse"></span>Help right now</button>
+</header>
+
+<div class="wrap">
+
+  <div class="crumb" id="crumb"></div>
+
+  <!-- ============ VIEW 1: categories ============ -->
+  <section class="view active" id="view-cats">
+    <h1 class="q">What do you need help with? <span class="wink">👋</span></h1>
+    <p class="q-sub">Tap one. Blueprint sends you straight to the right NYC service, the number to call, and exactly what to say when someone picks up.</p>
+    <div class="grid-cats" id="cat-grid"></div>
+  </section>
+
+  <!-- ============ VIEW 2: borough ============ -->
+  <section class="view" id="view-boro">
+    <h1 class="q">Which borough? 🗽</h1>
+    <p class="q-sub" id="boro-sub">This points you to the closest office. Not sure? Tap “Anywhere in NYC.”</p>
+    <div class="grid-boro" id="boro-grid"></div>
+    <button class="back" onclick="goCats()">‹ Back to categories</button>
+  </section>
+
+  <!-- ============ VIEW 3: results ============ -->
+  <section class="view" id="view-results">
+    <h1 class="q" id="results-title">Results</h1>
+    <p class="results-meta" id="results-meta"></p>
+    <div class="cards" id="cards"></div>
+    <button class="back" onclick="backToBoro()">‹ Choose a different borough</button>
+  </section>
+
+  <!-- ============ EMERGENCY ============ -->
+  <section class="view" id="view-emerg">
+    <div class="emerg-head">
+      <h2>Need help right now?</h2>
+      <p>If you or someone else is in immediate danger, call 911 first. Everything below is free and works 24/7.</p>
+    </div>
+    <div class="cards" id="emerg-cards"></div>
+    <button class="back" onclick="goCats()">‹ Back to start</button>
+  </section>
+
+  <!-- ============ TOURISM ============ -->
+  <section class="view" id="view-tourism">
+    <div class="visitor-banner">
+      <span class="stamp">Visitor</span>
+      <span>You’re in the visitor guide — kept separate from the NYC help services.</span>
+    </div>
+    <h1 class="q">Getting around & seeing NYC ✨</h1>
+    <p class="q-sub">The basics a first-time visitor actually needs.</p>
+    <div class="cards" id="tourism-cards"></div>
+    <button class="back" onclick="goCats()">‹ Back to start</button>
+  </section>
+
+  <!-- ============ footer stamp ============ -->
+  <div class="titleblock">
+    <div><span class="k">Project</span><span class="v">Blueprint — NYC Help Finder</span></div>
+    <div><span class="k">Sheet</span><span class="v">v1 · Verified Jul 2026</span></div>
+    <div><span class="k">Source</span><span class="v">Official NYC / 311</span></div>
+  </div>
+  <div class="lang-bar" id="lang-bar"><span class="globe" aria-hidden="true">🌐</span></div>
+  <p class="disclaimer" id="disclaimer"></p>
+
+</div>
+
+<script>
+/* ============================================================
+   DATA SEED — Blueprint's "database."
+   Every field maps cleanly to a JSON file or SQLite row later:
+     category | boroughs[] | name | helps | phone | phoneLabel
+     | link | linkLabel | script | documents[] | note | verified
+   boroughs:"all" = citywide. citywide:true on a category skips
+   the borough step entirely.
+   ============================================================ */
+
+const BOROUGHS = ["Bronx","Brooklyn","Manhattan","Queens","Staten Island"];
+
+const CATEGORIES = [
+  {id:"food", code:"FOOD", name:"Food",                  emoji:"🍎", color:"#FF6B4A", wash:"#FFE6DF", desc:"Groceries or a hot meal today — pantries and SNAP."},
+  {id:"rent", code:"RENT", name:"Housing / Rent",        emoji:"🏠", color:"#12B5A5", wash:"#D6F4F0", desc:"Behind on rent, an eviction notice, or a housing crisis."},
+  {id:"mind", code:"MIND", name:"Mental Health",         emoji:"💬", color:"#8B6FE8", wash:"#EAE3FB", desc:"Someone to talk to, any time — free and confidential.", citywide:true},
+  {id:"immg", code:"IMMG", name:"Immigrant Family Help", emoji:"🌍", color:"#35A85B", wash:"#DCF3E3", desc:"Free, safe immigration legal help. Status doesn’t matter."},
+  {id:"work", code:"WORK", name:"Jobs & Young Adults",   emoji:"💼", color:"#2F6BFF", wash:"#DFE9FF", desc:"Paid summer jobs and year-round career help."},
+  {id:"cash", code:"CASH", name:"Money & Benefits",      emoji:"💳", color:"#F5A623", wash:"#FCEFCC", desc:"Emergency cash, Fair Fares, and public benefits."},
+];
+
+const VISITOR_CAT = {id:"visit", code:"VISIT", name:"Visiting NYC", emoji:"🧳", color:"#FF5FA2", wash:"#FFE0EE", desc:"Getting around and what to see. (Separate from help.)"};
+
+const ALL_CATS = [...CATEGORIES, VISITOR_CAT];
+
+/* ---- resources (real, verified Jul 2026) ---- */
+const RESOURCES = [
+  /* FOOD */
+  {category:"food", boroughs:"all",
+    name:"Food pantries & community kitchens",
+    helps:"Free groceries or a hot meal near you. No cost, and many locations don’t ask for anything.",
+    phone:"311", phoneLabel:"Call 311",
+    link:"https://maps.nyc.gov/foodhelp/", linkLabel:"Food Help NYC map",
+    script:"Hi, I’m looking for a food pantry near me that’s open today. Can you help me find the closest one?",
+    documents:[], docsNote:"Usually nothing. Some sites ask for ID or proof of address — many don’t.",
+    verified:"Jul 2026"},
+  {category:"food", boroughs:"all",
+    name:"SNAP (food stamps / EBT)",
+    helps:"Monthly money on an EBT card to buy groceries. You may qualify even while working.",
+    phone:"718-557-1399", phoneLabel:"Call HRA · 718-557-1399",
+    link:"https://access.nyc.gov/programs/supplemental-nutrition-assistance-program-snap/", linkLabel:"Apply on ACCESS NYC",
+    script:"Hi, I’d like to apply for SNAP benefits. Can you tell me what documents I need and how to start?",
+    documents:["Photo ID","Proof of income (pay stubs)","Proof of address","Social Security numbers for the household"],
+    verified:"Jul 2026"},
+
+  /* HOUSING / RENT */
+  {category:"rent", boroughs:"all",
+    name:"Homebase — eviction prevention",
+    helps:"Free help if you’re behind on rent or at risk of losing your home. They build a plan and can connect you to rental assistance.",
+    phone:"311", phoneLabel:"Call 311 · say “Homebase”",
+    link:"https://www.nyc.gov/site/hra/help/homebase.page", linkLabel:"About Homebase",
+    script:"Hi, I’m at risk of losing my housing and I’d like to reach my nearest Homebase office. Can you connect me?",
+    documents:["Any court papers you’ve received","Lease or rent ledger","Letters from your landlord","Photo ID","Proof of income"],
+    verified:"Jul 2026"},
+  {category:"rent", boroughs:"all",
+    name:"Tenant Helpline — free eviction lawyer",
+    helps:"Under NYC’s Right to Counsel law, tenants facing eviction can get a free lawyer — in every ZIP code, regardless of immigration status.",
+    phone:"311", phoneLabel:"Call 311 · say “Tenant Helpline”",
+    link:"https://www.nyc.gov/site/hra/help/legal-services.page", linkLabel:"Tenant legal help",
+    script:"Hi, I got an eviction notice and I’d like free legal help through the Tenant Helpline.",
+    documents:["Your court papers","Lease","Photo ID"],
+    note:"If a landlord locks you out or shuts off your heat, gas, water, or electricity on purpose, that’s illegal — call 911.",
+    verified:"Jul 2026"},
+
+  /* MENTAL HEALTH (citywide) */
+  {category:"mind", boroughs:"all",
+    name:"NYC 988 — talk, text, or chat",
+    helps:"Free, confidential support for stress, anxiety, depression, or substance use — 24/7, in 200+ languages. NYC 988 does not ask about immigration status.",
+    phone:"988", phoneLabel:"Call or text 988",
+    link:"https://nyc988.cityofnewyork.us/en/", linkLabel:"Chat with a counselor",
+    script:"Hi, I’m going through a hard time and I’d like to talk to someone.",
+    documents:[], docsNote:"None. No insurance needed.",
+    note:"If you or someone else is in immediate danger, call 911.",
+    verified:"Jul 2026"},
+
+  /* IMMIGRANT FAMILY HELP */
+  {category:"immg", boroughs:"all",
+    name:"ActionNYC — free immigration legal help",
+    helps:"City-funded, free, and safe legal screenings and representation, in your language. Open to everyone in NYC, and your information stays confidential.",
+    phone:"800-354-0365", phoneLabel:"Call · 800-354-0365",
+    link:"https://www.nyc.gov/site/immigrants/index.page", linkLabel:"Immigrant Affairs",
+    script:"Hi, I’d like to make an appointment for free immigration legal help through ActionNYC.",
+    documents:["Any immigration paperwork you have — but you don’t need documents to start"],
+    note:"Open Mon–Fri, 9 AM–6 PM. You can also call 311 and say “ActionNYC.” If a family member is detained, call the Legal Aid Society at 844-955-3425.",
+    verified:"Jul 2026"},
+  {category:"immg", boroughs:"all",
+    name:"IDNYC — free ID card",
+    helps:"A free government photo ID for anyone who lives in NYC and is 10 or older — no matter your immigration status. Works for banks, city buildings, and more.",
+    phone:"311", phoneLabel:"Call 311 · say “IDNYC”",
+    link:"https://www.nyc.gov/site/idnyc/index.page", linkLabel:"Apply for IDNYC",
+    script:"Hi, I’d like to apply for an IDNYC card. What documents do I need?",
+    documents:["Proof of identity","Proof you live in NYC","(A points system — 311 can list what counts)"],
+    verified:"Jul 2026"},
+
+  /* JOBS & YOUNG ADULTS */
+  {category:"work", boroughs:"all",
+    name:"Workforce1 Career Centers",
+    helps:"Free, year-round help finding a job: résumé workshops, training referrals, and connections to employers across the five boroughs.",
+    phone:"311", phoneLabel:"Call 311 · say “Workforce1”",
+    link:"https://www.nyc.gov/site/sbs/careers/career-services.page", linkLabel:"Find a Workforce1 center",
+    script:"Hi, I’m looking for a job and I’d like help from a Workforce1 Career Center near me.",
+    documents:["Résumé, if you have one","Photo ID"],
+    verified:"Jul 2026"},
+  {category:"work", boroughs:"all",
+    name:"SYEP — paid summer jobs (ages 14–24)",
+    helps:"The Summer Youth Employment Program gives young New Yorkers a paid summer job and career experience.",
+    phone:"800-246-4646", phoneLabel:"Call DYCD · 800-246-4646",
+    link:"https://www.nyc.gov/site/dycd/services/jobs-internships/summer-youth-employment-program-syep.page", linkLabel:"SYEP at DYCD",
+    script:"Hi, I’d like information about SYEP and when the next application opens.",
+    documents:["Photo ID (school ID, IDNYC, or state ID)","Social Security card","Proof of age and address"],
+    note:"Applications are seasonal — they open in winter for the coming summer, and this summer’s window has already closed. Check DYCD for the next round.",
+    verified:"Jul 2026"},
+
+  /* MONEY & BENEFITS */
+  {category:"cash", boroughs:"all",
+    name:"Emergency cash — One-Shot Deal",
+    helps:"A one-time emergency grant from HRA if you can’t cover rent, utilities, or another urgent need because of a sudden hardship.",
+    phone:"718-557-1399", phoneLabel:"Call HRA · 718-557-1399",
+    link:"https://access.nyc.gov/programs/emergency-assistance-one-time-grant/", linkLabel:"About the One-Shot Deal",
+    script:"Hi, I have an emergency and I can’t pay my rent or bills. I’d like to apply for a One-Shot Deal.",
+    documents:["Photo ID","Proof of income","Proof of the emergency (the bill or notice)"],
+    verified:"Jul 2026"},
+  {category:"cash", boroughs:"all",
+    name:"Fair Fares — half-price transit",
+    helps:"50% off subway and eligible bus fares (and Access-A-Ride) for eligible New Yorkers ages 18–64, with income up to 150% of the federal poverty level.",
+    phone:"311", phoneLabel:"Call 311 · say “Fair Fares”",
+    link:"https://www.nyc.gov/site/fairfares/index.page", linkLabel:"Check eligibility & apply",
+    script:"Hi, I’d like to check if I qualify for Fair Fares and how to apply.",
+    documents:["Photo ID","Proof of NYC address","Proof of income (tax return or pay stubs)"],
+    verified:"Jul 2026"},
+  {category:"cash", boroughs:"all",
+    name:"Cash Assistance & Medicaid",
+    helps:"Apply for Cash Assistance, SNAP, and Medicaid together in one application through ACCESS HRA — twice-a-month cash to help meet basic needs.",
+    phone:"718-557-1399", phoneLabel:"Call HRA · 718-557-1399",
+    link:"https://access.nyc.gov/programs/cash-assistance/", linkLabel:"Apply on ACCESS NYC",
+    script:"Hi, I’d like to apply for Cash Assistance. Can you tell me how to start and what I’ll need?",
+    documents:["Photo ID","Proof of income","Proof of address","Social Security numbers for the household"],
+    verified:"Jul 2026"},
+];
+
+const EMERGENCY = [
+  {danger:true, num:"911", tel:"911", when:"Immediate danger, a medical emergency, a crime in progress, or a landlord locking you out or cutting off heat."},
+  {num:"311", tel:"311", when:"Any NYC city service, non-emergency. Free, 24/7, 175+ languages. When you don’t know who else to call, start here."},
+  {num:"988", tel:"988", when:"A mental health, suicide, or substance-use crisis — for you or someone you care about. Call or text, 24/7."},
+  {num:"311 · “Homebase”", tel:"311", when:"A housing emergency or the threat of losing your home tonight."},
+  {num:"800-621-4673", tel:"800-621-4673", when:"NYC’s 24-hour Domestic Violence Hotline (800-621-HOPE). Safe and confidential."},
+];
+
+const TOURISM = [
+  {name:"Getting around — OMNY & the subway",
+   helps:"Tap a credit card, phone, or OMNY card at any turnstile or bus reader. A single ride is about $2.90, and after 12 rides in 7 days the rest of that week is free.",
+   phone:"511", phoneLabel:"MTA info · 511", link:"https://www.mta.info/fares-tolls", linkLabel:"MTA fares & maps"},
+  {name:"Official NYC visitor guide",
+   helps:"Neighborhoods, events, and the well-known sights — from the city’s official tourism office.",
+   phone:null, phoneLabel:null, link:"https://www.nyctourism.com/", linkLabel:"NYC Tourism"},
+  {name:"Free & cheap things to do",
+   helps:"The Staten Island Ferry is free with the best skyline view in the city. Central Park, the High Line, and the Brooklyn Bridge walk cost nothing — and many museums have pay-what-you-wish hours.",
+   phone:null, phoneLabel:null, link:"https://www.nyctourism.com/things-to-do/free/", linkLabel:"Free things to do"},
+  {name:"Staying safe as a visitor",
+   helps:"911 for emergencies, 311 for anything else. Keep bags zipped and close on crowded trains, and stick to well-lit stations late at night.",
+   phone:"311", phoneLabel:"NYC services · 311", link:null, linkLabel:null},
+];
+
+/* ============================================================
+   STATE + RENDER
+   ============================================================ */
+let state = { category:null, borough:null };
+
+const views = {
+  cats:document.getElementById("view-cats"),
+  boro:document.getElementById("view-boro"),
+  results:document.getElementById("view-results"),
+  emerg:document.getElementById("view-emerg"),
+  tourism:document.getElementById("view-tourism"),
+};
+
+function setCatColor(cat){
+  const root = document.documentElement;
+  root.style.setProperty("--cat", cat ? cat.color : "#2F6BFF");
+  root.style.setProperty("--cat-wash", cat ? cat.wash : "#DFE9FF");
+}
+
+function show(name){
+  Object.values(views).forEach(v=>v.classList.remove("active"));
+  views[name].classList.add("active");
+  window.scrollTo({top:0, behavior:"smooth"});
+  renderCrumb(name);
+}
+
+function renderCrumb(name){
+  const c = document.getElementById("crumb");
+  if(name==="cats"||name==="emerg"||name==="tourism"){ c.innerHTML=""; return; }
+  const cat = ALL_CATS.find(x=>x.id===state.category);
+  let html = `<span class="step" onclick="goCats()">Start</span>`;
+  if(cat){
+    html += `<span class="sep">›</span>`;
+    html += (name==="results" && !cat.citywide)
+      ? `<span class="step" onclick="backToBoro()">${cat.name}</span>`
+      : `<span class="step" aria-disabled="true">${cat.name}</span>`;
+  }
+  if(name==="results" && state.borough){
+    html += `<span class="sep">›</span><span class="step" aria-disabled="true">${state.borough}</span>`;
+  }
+  c.innerHTML = html;
+}
+
+/* categories */
+function renderCats(){
+  const grid = document.getElementById("cat-grid");
+  grid.innerHTML = "";
+  CATEGORIES.forEach(cat=> grid.appendChild(catButton(cat)));
+  const note = document.createElement("div");
+  note.className = "divider-note";
+  note.textContent = "Just visiting? ✈️";
+  grid.appendChild(note);
+  grid.appendChild(catButton(VISITOR_CAT,true));
+}
+function catButton(cat,isVisitor){
+  const b = document.createElement("button");
+  b.className = "cat" + (isVisitor?" visitor":"");
+  b.style.setProperty("--c", cat.color);
+  b.style.setProperty("--cw", cat.wash);
+  b.style.background = cat.wash;
+  b.innerHTML = `<span class="emoji" style="box-shadow:2px 2px 0 ${cat.color}">${cat.emoji}</span>
+    <span class="cat-name">${cat.name}</span>
+    <span class="cat-desc">${cat.desc}</span>`;
+  b.onclick = ()=> chooseCategory(cat);
+  return b;
+}
+
+function chooseCategory(cat){
+  state.category = cat.id;
+  state.borough = null;
+  setCatColor(cat);
+  if(cat.id==="visit"){ renderTourism(); show("tourism"); return; }
+  if(cat.citywide){ state.borough="Anywhere in NYC"; renderResults(); show("results"); return; }
+  renderBoroughs(cat);
+  show("boro");
+}
+
+/* boroughs */
+function renderBoroughs(cat){
+  document.getElementById("boro-sub").textContent =
+    `Where should we point you for ${cat.name.toLowerCase()}? Not sure? Tap “Anywhere in NYC.”`;
+  const grid = document.getElementById("boro-grid");
+  grid.innerHTML = "";
+  BOROUGHS.forEach(b=>{
+    const el = document.createElement("button");
+    el.className = "boro";
+    el.innerHTML = `<span>${b}</span><span class="arrow">›</span>`;
+    el.onclick = ()=>{ state.borough=b; renderResults(); show("results"); };
+    grid.appendChild(el);
+  });
+  const any = document.createElement("button");
+  any.className = "boro wide";
+  any.innerHTML = `<span>Anywhere in NYC / not sure</span><span class="arrow">✦</span>`;
+  any.onclick = ()=>{ state.borough="Anywhere in NYC"; renderResults(); show("results"); };
+  grid.appendChild(any);
+}
+
+/* results */
+function renderResults(){
+  const cat = CATEGORIES.find(x=>x.id===state.category);
+  document.getElementById("results-title").innerHTML = `${cat.emoji} ${cat.name}`;
+  const list = RESOURCES.filter(r=>r.category===state.category &&
+    (r.boroughs==="all" || r.boroughs.includes(state.borough)));
+  document.getElementById("results-meta").textContent =
+    `${list.length} ${list.length===1?"resource":"resources"} · ${state.borough} · verified Jul 2026`;
+  const wrap = document.getElementById("cards");
+  wrap.innerHTML = "";
+  list.forEach(r=> wrap.appendChild(resourceCard(r)));
+}
+
+function resourceCard(r){
+  const card = document.createElement("div");
+  card.className = "card";
+  let actions = "";
+  if(r.phone) actions += `<a class="btn-call" href="tel:${r.phone.replace(/[^0-9]/g,'')}">📞 ${r.phoneLabel}</a>`;
+  if(r.link)  actions += `<a class="btn-link" href="${r.link}" target="_blank" rel="noopener">${r.linkLabel} ↗</a>`;
+
+  let docsHtml = "";
+  if(r.documents && r.documents.length){
+    docsHtml = `<div class="docs"><span class="lbl">What they may ask for</span>
+      <ul>${r.documents.map(d=>`<li>${d}</li>`).join("")}</ul></div>`;
+  } else if(r.docsNote){
+    docsHtml = `<div class="docs"><span class="lbl">What they may ask for</span><p class="none">${r.docsNote}</p></div>`;
+  }
+  const scriptHtml = r.script ? `<div class="script">
+      <span class="lbl">🗣 What to say when you call</span>
+      <span class="quote">“${r.script}”</span></div>` : "";
+  const noteHtml = r.note ? `<div class="card-note">${r.note}</div>` : "";
+
+  card.innerHTML = `
+    <div class="card-stripe"></div>
+    <div class="card-top">
+      <h2 class="card-name">${r.name}</h2>
+      <p class="card-helps">${r.helps}</p>
+      <div class="card-actions">${actions}</div>
+    </div>
+    ${scriptHtml}${docsHtml}${noteHtml}
+    <div class="card-foot">
+      <span class="verified"><span class="dot"></span> Verified ${r.verified||"Jul 2026"}</span>
+      <span>Confirm current details by calling 311</span>
+    </div>`;
+  return card;
+}
+
+/* emergency */
+function renderEmergency(){
+  setCatColor(null);
+  const wrap = document.getElementById("emerg-cards");
+  wrap.innerHTML = "";
+  EMERGENCY.forEach(e=>{
+    const el = document.createElement("div");
+    el.className = "emerg-card" + (e.danger?" danger":"");
+    el.innerHTML = `<span class="num"><a href="tel:${e.tel}">${e.num}</a></span><span class="when">${e.when}</span>`;
+    wrap.appendChild(el);
+  });
+}
+
+/* tourism */
+function renderTourism(){
+  const wrap = document.getElementById("tourism-cards");
+  wrap.innerHTML = "";
+  TOURISM.forEach(t=>{
+    const card = document.createElement("div");
+    card.className = "card";
+    let actions = "";
+    if(t.phone) actions += `<a class="btn-call" href="tel:${t.phone.replace(/[^0-9]/g,'')}">📞 ${t.phoneLabel}</a>`;
+    if(t.link)  actions += `<a class="btn-link" href="${t.link}" target="_blank" rel="noopener">${t.linkLabel} ↗</a>`;
+    card.innerHTML = `<div class="card-stripe"></div><div class="card-top">
+        <h2 class="card-name">${t.name}</h2>
+        <p class="card-helps">${t.helps}</p>
+        <div class="card-actions">${actions}</div></div>`;
+    wrap.appendChild(card);
+  });
+}
+
+/* nav */
+function goCats(){ state={category:null,borough:null}; setCatColor(null); show("cats"); }
+function backToBoro(){
+  const cat = CATEGORIES.find(x=>x.id===state.category);
+  if(cat && cat.citywide){ goCats(); return; }
+  renderBoroughs(cat); show("boro");
+}
+function showEmergency(){ renderEmergency(); show("emerg"); }
+
+/* ============================================================
+   LANGUAGES — NYC's official language-access set (Local Law 30),
+   which covers the city's most commonly spoken languages.
+   Translations are a first pass and should be checked by a native
+   speaker before real-world use, especially the non-Latin scripts.
+   ============================================================ */
+const LANGS = [
+  {code:"en", label:"English", dir:"ltr",
+    lead:"Always confirm before you go.",
+    body:"Hours, phone numbers, and eligibility rules change. When in doubt, call 311 — it’s free, open 24/7, and available in 175+ languages. Blueprint points you to official NYC services; it doesn’t collect your information or decide what you qualify for."},
+  {code:"es", label:"Español", dir:"ltr",
+    lead:"Confirma siempre antes de ir.",
+    body:"Los horarios, los números de teléfono y los requisitos pueden cambiar. Si tienes dudas, llama al 311: es gratis, funciona las 24 horas y está disponible en más de 175 idiomas. Blueprint te dirige a servicios oficiales de NYC; no recopila tu información ni decide para qué calificas."},
+  {code:"zh", label:"中文", dir:"ltr",
+    lead:"出發前請務必確認。",
+    body:"開放時間、電話號碼和資格規定可能會變更。如有疑問，請撥打 311——免費、全天候 24/7 提供服務，並支援 175 種以上語言。Blueprint 為您指引紐約市官方服務；我們不會收集您的資訊，也不會判定您符合哪些資格。"},
+  {code:"ru", label:"Русский", dir:"ltr",
+    lead:"Всегда уточняйте информацию перед визитом.",
+    body:"Часы работы, номера телефонов и правила могут меняться. Если сомневаетесь, звоните 311 — это бесплатно, круглосуточно и более чем на 175 языках. Blueprint направляет вас к официальным службам Нью-Йорка; мы не собираем ваши данные и не решаем, на что вы имеете право."},
+  {code:"bn", label:"বাংলা", dir:"ltr",
+    lead:"যাওয়ার আগে সবসময় নিশ্চিত হয়ে নিন।",
+    body:"সময়সূচি, ফোন নম্বর এবং যোগ্যতার নিয়ম পরিবর্তন হতে পারে। সন্দেহ হলে 311 নম্বরে কল করুন — এটি বিনামূল্যে, দিনে ২৪ ঘণ্টা খোলা এবং ১৭৫টিরও বেশি ভাষায় পাওয়া যায়। Blueprint আপনাকে NYC-এর সরকারি পরিষেবার দিকে নির্দেশ করে; এটি আপনার তথ্য সংগ্রহ করে না বা আপনি কীসের জন্য যোগ্য তা নির্ধারণ করে না।"},
+  {code:"ht", label:"Kreyòl", dir:"ltr",
+    lead:"Toujou konfime anvan ou ale.",
+    body:"Orè, nimewo telefòn, ak règ kalifikasyon yo ka chanje. Si ou pa sèten, rele 311 — li gratis, li ouvè 24/7, epi li disponib nan plis pase 175 lang. Blueprint dirije ou vè sèvis ofisyèl Vil Nouyòk; li pa kolekte enfòmasyon ou epi li pa deside ki sa ou kalifye pou li."},
+  {code:"ko", label:"한국어", dir:"ltr",
+    lead:"방문하기 전에 항상 확인하세요.",
+    body:"운영 시간, 전화번호, 자격 요건은 변경될 수 있습니다. 잘 모르겠으면 311로 전화하세요 — 무료이며, 연중무휴 24시간 운영되고, 175개 이상의 언어로 지원됩니다. Blueprint는 뉴욕시 공식 서비스로 안내합니다. 귀하의 정보를 수집하거나 자격 여부를 결정하지 않습니다."},
+  {code:"ar", label:"العربية", dir:"rtl",
+    lead:"تأكّد دائمًا قبل الذهاب.",
+    body:"قد تتغيّر ساعات العمل وأرقام الهواتف وقواعد الأهلية. عند الشك، اتصل بالرقم 311 — فهو مجاني ومتاح على مدار الساعة طوال أيام الأسبوع وبأكثر من 175 لغة. يوجّهك Blueprint إلى خدمات مدينة نيويورك الرسمية؛ وهو لا يجمع معلوماتك ولا يقرّر ما إذا كنت مؤهلاً."},
+  {code:"ur", label:"اردو", dir:"rtl",
+    lead:"جانے سے پہلے ہمیشہ تصدیق کر لیں۔",
+    body:"اوقات، فون نمبر اور اہلیت کے اصول تبدیل ہو سکتے ہیں۔ شک ہو تو 311 پر کال کریں — یہ مفت ہے، چوبیس گھنٹے کھلا ہے، اور 175 سے زائد زبانوں میں دستیاب ہے۔ Blueprint آپ کو NYC کی سرکاری خدمات کی طرف رہنمائی کرتا ہے؛ یہ آپ کی معلومات جمع نہیں کرتا اور نہ یہ فیصلہ کرتا ہے کہ آپ کس چیز کے اہل ہیں۔"},
+  {code:"fr", label:"Français", dir:"ltr",
+    lead:"Vérifiez toujours avant de vous déplacer.",
+    body:"Les horaires, les numéros de téléphone et les critères d’admissibilité peuvent changer. En cas de doute, appelez le 311 — c’est gratuit, ouvert 24 h/24 et 7 j/7, et disponible dans plus de 175 langues. Blueprint vous oriente vers les services officiels de la ville de New York ; il ne collecte pas vos informations et ne décide pas de ce à quoi vous avez droit."},
+  {code:"pl", label:"Polski", dir:"ltr",
+    lead:"Zawsze potwierdź przed wizytą.",
+    body:"Godziny otwarcia, numery telefonów i zasady kwalifikacji mogą się zmieniać. W razie wątpliwości zadzwoń pod numer 311 — to bezpłatne, czynne całą dobę i dostępne w ponad 175 językach. Blueprint kieruje Cię do oficjalnych usług miasta Nowy Jork; nie zbiera Twoich danych ani nie decyduje, do czego się kwalifikujesz."},
+];
+
+function renderLang(){
+  const bar = document.getElementById("lang-bar");
+  LANGS.forEach(l=>{
+    const b = document.createElement("button");
+    b.className = "lang-chip";
+    b.textContent = l.label;
+    b.dir = l.dir;
+    b.setAttribute("lang", l.code);
+    b.onclick = ()=> setLang(l.code, b);
+    bar.appendChild(b);
+  });
+  setLang("en");
+}
+function setLang(code, btn){
+  const l = LANGS.find(x=>x.code===code);
+  const p = document.getElementById("disclaimer");
+  p.dir = l.dir;
+  p.setAttribute("lang", l.code);
+  const linked = l.body.replace("311", '<a href="tel:311">311</a>');
+  p.innerHTML = `<b>${l.lead}</b> ${linked}`;
+  document.querySelectorAll(".lang-chip").forEach(c=>c.classList.remove("active"));
+  if(btn){ btn.classList.add("active"); }
+  else { const first=document.querySelector(".lang-chip"); if(first) first.classList.add("active"); }
+}
+
+/* init */
+renderCats();
+renderCrumb("cats");
+renderLang();
+</script>
+</body>
+</html>
