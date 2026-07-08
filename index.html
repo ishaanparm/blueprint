@@ -15,6 +15,7 @@
      sticker-shadow tiles, one bold color per category, bouncy
      hovers. Playful where it invites you in; calm and clear where
      someone might be in a crisis.
+  
      ============================================================ */
 
   :root{
@@ -295,6 +296,22 @@
     *{animation:none!important;transition:none!important;}
     .cat:hover,.boro:hover,.btn-call:hover,.btn-link:hover,.back:hover,.head-emergency:hover{transform:none;}
   }
+.site-credit {
+  text-align: center;
+  padding: 24px;
+  font-size: 14px;
+  color: #667085;
+}
+
+.site-credit a {
+  color: inherit;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.site-credit a:hover {
+  text-decoration: underline;
+}
 </style>
 </head>
 <body>
@@ -790,5 +807,8 @@ renderCats();
 renderCrumb("cats");
 renderLang();
 </script>
+<footer class="site-credit">
+Made by <a href="https://github.com/ishaanparm" target="_blank" rel="noopener">Ishaan Parmar</a>
+</footer>
 </body>
 </html>
